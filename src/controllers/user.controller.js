@@ -25,7 +25,7 @@ export const getUserByIdWithArticles = async (req, res, next) => {
     const user = await User.findById(userId);
 
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      return res.status(404).send("User not found");
     }
 
     const articles = await Article.find({ owner: userId });
@@ -75,7 +75,7 @@ export const updateUserById = async (req, res, next) => {
     const user = await User.findById(userId);
 
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      return res.status(404).send("User not found");
     }
 
     user.firstName = req.body.firstName || user.firstName;
@@ -96,7 +96,7 @@ export const deleteUserById = async (req, res, next) => {
 
     const user = await User.findById(userId);
     if (!user) {
-      return res.status(404).json({ error: "User not found" });
+      return res.status(404).send("User not found");
     }
 
     await Article.deleteMany({ owner: userId });
@@ -105,7 +105,7 @@ export const deleteUserById = async (req, res, next) => {
 
     res
       .status(200)
-      .json({ message: "User and associated articles deleted successfully." });
+      .send("User and associated articles deleted successfully.");
   } catch (err) {
     next(err);
   }

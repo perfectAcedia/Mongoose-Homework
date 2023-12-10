@@ -18,7 +18,7 @@ export const getArticles = async (req, res, next) => {
 
     res.status(200).json(articles);
   } catch (err) {
-    console.log(err);;
+    next(err);
   }
 };
 
@@ -28,7 +28,7 @@ export const getArticleById = async (req, res, next) => {
 
     const article = await Article.findById(articleId);
     if (!article) {
-      return res.status(404).json({ error: "Article not found" });
+      return res.status(404).send("Article not found");
     }
 
     res.status(200).json(article);
@@ -42,7 +42,7 @@ export const createArticle = async (req, res, next) => {
     const owner = await User.findById(req.body.owner);
 
     if (!owner) {
-      return res.status(404).json({ error: "Owner not found" });
+      return res.status(404).send("Owner not found");
     }
 
     const article = new Article({
@@ -71,12 +71,12 @@ export const updateArticleById = async (req, res, next) => {
 
     const article = await Article.findById(articleId);
     if (!article) {
-      return res.status(404).json({ error: "Article not found" });
+      return res.status(404).send("Article not found");
     }
 
     const owner = await User.findById(article.owner);
     if (!owner) {
-      return res.status(404).json({ error: "Owner not found" });
+      return res.status(404).send("Owner not found");
     }
 
     const loggedInUserId = req.headers.userid;
@@ -84,9 +84,7 @@ export const updateArticleById = async (req, res, next) => {
     if (owner._id.toString() !== loggedInUserId) {
       return res
         .status(403)
-        .json({
-          error: "Permission denied. Only the owner can update the article.",
-        });
+        .send("Permission denied. Only the owner can update the article.");
     }
 
     article.title = title || article.title;
@@ -109,19 +107,19 @@ export const deleteArticleById = async (req, res, next) => {
 
     const article = await Article.findById(articleId);
     if (!article) {
-      return res.status(404).json({ error: 'Article not found' });
+      return res.status(404).send("Article not found");
     }
 
     const owner = await User.findById(article.owner);
     if (!owner) {
-      return res.status(404).json({ error: 'Owner not found' });
+      return res.status(404).send("Owner not found");
     }
 
 
     const loggedInUserId = req.headers.userid;
 
     if (owner._id.toString() !== loggedInUserId) {
-      return res.status(403).json({ error: 'Permission denied. Only the owner can delete the article.' });
+      return res.status(403).send("Permission denied. Only the owner can delete the article.");
     }
 
     owner.numberOfArticles -= 1;
@@ -129,7 +127,7 @@ export const deleteArticleById = async (req, res, next) => {
 
     await Article.findByIdAndDelete(articleId);
 
-    res.status(200).json({ message: 'Article deleted successfully.' });
+    res.status(200).send("Article deleted successfully.");
   } catch (err) {
     next(err);
   }
